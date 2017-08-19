@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/refresh"
+        android:orderInCategory="100"
+        android:title="重新加载"
+        app:showAsAction="never" />
+
+
+    <item
+        android:id="@+id/empty"
+        android:orderInCategory="100"
+        android:title="空的"
+        app:showAsAction="never" />
+
+
+    <item
+        android:id="@+id/error"
+        android:orderInCategory="100"
+        android:title="错误"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/not_more"
+        android:orderInCategory="100"
+        android:title="没有更多了"
+        app:showAsAction="never" />
+</menu>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="LayoutManager">
+        <menu>
+            <item
+                android:id="@+id/lm_hor"
+                android:title="HORIZONTAL"/>
+            <item
+                android:id="@+id/lm_ver"
+                android:title="VERTICAL"/>
+        </menu>
+    </item>
+
+    <item android:title="GridLayoutManager">
+        <menu>
+            <item
+                android:id="@+id/glm_hor"
+                android:title="HORIZONTAL"/>
+            <item
+                android:id="@+id/glm_ver"
+                android:title="VERTICAL"/>
+        </menu>
+    </item>
+
+    <item android:title="StaggeredGridLayoutManager">
+        <menu>
+            <item
+                android:id="@+id/sglm_hor"
+                android:title="HORIZONTAL"/>
+            <item
+                android:id="@+id/sglm_ver"
+                android:title="VERTICAL"/>
+        </menu>
+    </item>
+</menu>
