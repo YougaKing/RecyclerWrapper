@@ -9,44 +9,39 @@ import android.view.ViewGroup;
 
 import android.view.ViewGroup.LayoutParams;
 
-import com.youga.recyclerwrapper.Wrapper;
 import com.youga.recyclerwrapper.core.FillWrapper;
 import com.youga.recyclerwrapper.core.FootWrapper;
+import com.youga.recyclerwrapper.core.InteractionListener;
 
 
 /**
  * Created by Youga on 2015/9/2.
  */
-public class RealAdapter extends AdapterWrapper implements InteractionListener {
+public final class RealAdapter extends AdapterWrapper {
 
     private static final String TAG = "RealAdapter";
-    private Wrapper mWrapper;
+    private InteractionListener.InternalListener mListener;
 
-    public RealAdapter(@NonNull Wrapper wrapper) {
-        super(wrapper.adapter);
-        mWrapper = wrapper;
-        mWrapper.interactionListener = this;
+    public RealAdapter(@NonNull RecyclerView.Adapter adapter, InteractionListener.InternalListener listener) {
+        super(adapter);
+        mListener = listener;
     }
 
     @Override
     public int getItemCount() {
-        if (mWrapper.fillWrapper.getType() != FillWrapper.NONE) {
+        if (mListener.getFillType() != FillWrapper.NONE) {
             return 1;
         } else {
-            if (mWrapper.loadMoreListener == null) {
-                return super.getItemCount();
-            } else {
-                return mWrapper.footWrapper.getType() != FootWrapper.F_NONE ? super.getItemCount() + 1 : super.getItemCount();
-            }
+            return mListener.getFootType() != FootWrapper.F_NONE ? super.getItemCount() + 1 : super.getItemCount();
         }
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (position == 0 && mWrapper.fillWrapper.getType() != FillWrapper.NONE) {
-            return mWrapper.fillWrapper.getType();
+        if (position == 0 && mListener.getFillType() != FillWrapper.NONE) {
+            return mListener.getFillType();
         } else if (position == super.getItemCount()) {
-            return mWrapper.footWrapper.getType();
+            return mListener.getFootType();
         } else {
             return super.getItemViewType(position);
         }
@@ -54,15 +49,14 @@ public class RealAdapter extends AdapterWrapper implements InteractionListener {
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Log.d(TAG, "onCreateViewHolder()-->viewType:" + viewType);
         switch (viewType) {
             case FillWrapper.LOAD:
             case FillWrapper.EMPTY:
             case FillWrapper.ERROR:
-                return new FillViewHolder(mWrapper.fillWrapper.getFillView().createView());
+                return new FillViewHolder(mListener.getFillView());
             case FootWrapper.F_LOAD:
             case FootWrapper.F_FAULT:
-                return new FootViewHolder(mWrapper.footWrapper.getFootView().createView());
+                return new FootViewHolder(mListener.getFootView());
             default:
                 return super.onCreateViewHolder(parent, viewType);
         }
@@ -81,49 +75,18 @@ public class RealAdapter extends AdapterWrapper implements InteractionListener {
         }
     }
 
-    @Override
-    public void showLoadView() {
-        mWrapper.fillWrapper.setType(FillWrapper.LOAD);
+    public void internalNotify() {
         getAdapter().notifyDataSetChanged();
-        Log.w(TAG, "showLoadView()");
     }
 
-    @Override
-    public void showErrorView() {
-        mWrapper.fillWrapper.setType(FillWrapper.ERROR);
-        getAdapter().notifyDataSetChanged();
-        Log.w(TAG, "showErrorView()");
-    }
 
-    @Override
-    public void showEmptyView() {
-        mWrapper.fillWrapper.setType(FillWrapper.EMPTY);
-        getAdapter().notifyDataSetChanged();
-        Log.w(TAG, "showEmptyView()");
-    }
+    private class FillViewHolder extends RecyclerView.ViewHolder {
 
-    @Override
-    public void loadMoreFault() {
-        mWrapper.footWrapper.setType(FootWrapper.F_FAULT);
-        getAdapter().notifyDataSetChanged();
-        Log.w(TAG, "loadMoreFault()");
-    }
-
-    @Override
-    public void showItemView() {
-        mWrapper.footWrapper.setLoading(false);
-        mWrapper.fillWrapper.setType(FillWrapper.NONE);
-        getAdapter().notifyDataSetChanged();
-        Log.w(TAG, "showItemView()");
-    }
-
-    public class FillViewHolder extends RecyclerView.ViewHolder {
-
-        public FillViewHolder(View itemView) {
+        FillViewHolder(View itemView) {
             super(itemView);
         }
 
-        public void bindView() {
+        void bindView() {
             if (mWrapper.width == 0) {
                 itemView.setVisibility(View.INVISIBLE);
                 itemView.postDelayed(new Runnable() {
@@ -157,14 +120,14 @@ public class RealAdapter extends AdapterWrapper implements InteractionListener {
         }
     }
 
-    public class FootViewHolder extends RecyclerView.ViewHolder {
+    private class FootViewHolder extends RecyclerView.ViewHolder {
 
 
-        public FootViewHolder(View itemView) {
+        FootViewHolder(View itemView) {
             super(itemView);
         }
 
-        public void bindView() {
+        void bindView() {
             if (itemView.getLayoutParams() == null) {
                 itemView.setLayoutParams(new LayoutParams(mWrapper.width, LayoutParams.WRAP_CONTENT));
             } else {

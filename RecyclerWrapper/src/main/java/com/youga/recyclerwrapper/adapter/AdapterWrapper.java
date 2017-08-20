@@ -6,11 +6,11 @@ import android.view.ViewGroup;
 /**
  * Created by YougaKing on 2016/8/11.
  */
-public class AdapterWrapper extends RecyclerView.Adapter {
+class AdapterWrapper extends RecyclerView.Adapter {
 
     private final RecyclerView.Adapter<RecyclerView.ViewHolder> mAdapter;
 
-    public AdapterWrapper(RecyclerView.Adapter<RecyclerView.ViewHolder> adapter) {
+    AdapterWrapper(RecyclerView.Adapter<RecyclerView.ViewHolder> adapter) {
         mAdapter = adapter;
         mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             public void onChanged() {
@@ -105,7 +105,7 @@ public class AdapterWrapper extends RecyclerView.Adapter {
         mAdapter.onDetachedFromRecyclerView(recyclerView);
     }
 
-    public RecyclerView.Adapter<RecyclerView.ViewHolder> getAdapter() {
+    RecyclerView.Adapter<RecyclerView.ViewHolder> getAdapter() {
         return mAdapter;
     }
 }
