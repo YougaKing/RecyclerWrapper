@@ -15,30 +15,34 @@ import com.youga.recyclerwrapper.view.IFootViewProvider;
  * Created by Youga on 2017/8/17.
  */
 
-public class Interaction implements Wrapper, InteractionListener.RevealListener, InteractionListener.InternalListener {
+class Interaction implements Wrapper, InteractionListener.RevealListener, InteractionListener.InternalListener {
 
     private FillWrapper fillWrapper = new FillWrapper<>();
     private FootWrapper footWrapper = new FootWrapper<>();
-    public RealAdapter realAdapter;
+    private RealAdapter realAdapter;
     private Wrapper wrapper;
     private RecyclerView recyclerView;
     private LoadMoreListener mLoadMoreListener;
 
-    public Interaction(final RecyclerView recyclerView) {
+    Interaction(final RecyclerView recyclerView) {
         wrapper = this;
         realAdapter = new RealAdapter(recyclerView.getAdapter(), this);
         this.recyclerView = recyclerView;
         recyclerView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
             @Override
             public void onViewAttachedToWindow(View v) {
-                RecyclerWrapper.getInstance().listener = null;
+
             }
 
             @Override
             public void onViewDetachedFromWindow(View v) {
-
+                RecyclerWrapper.getInstance().listener = null;
             }
         });
+        IFillViewProvider[] fillViewProviders = RecyclerWrapper.getInstance().fillViewProviders;
+        IFootViewProvider[] footViewProviders = RecyclerWrapper.getInstance().footViewProviders;
+        fillWrapper.setFillView(fillViewProviders[1] == null ? fillViewProviders[0] : fillViewProviders[1]);
+        footWrapper.setFootView(footViewProviders[1] == null ? footViewProviders[0] : footViewProviders[1]);
     }
 
     @Override
@@ -101,14 +105,12 @@ public class Interaction implements Wrapper, InteractionListener.RevealListener,
 
     @Override
     public View getFillView() {
-        return fillWrapper.getFillView() == null ? RecyclerWrapper.getInstance().fillViewProviders[0].createView()
-                : fillWrapper.getFillView().createView();
+        return fillWrapper.getFillView().createView();
     }
 
     @Override
     public View getFootView() {
-        return footWrapper.getFootView() == null ? RecyclerWrapper.getInstance().footViewProviders[0].createView()
-                : footWrapper.getFootView().createView();
+        return footWrapper.getFootView().createView();
     }
 
     @Override
@@ -173,7 +175,7 @@ public class Interaction implements Wrapper, InteractionListener.RevealListener,
         return mLoadMoreListener == null;
     }
 
-    public Wrapper getWrapper() {
+    Wrapper getWrapper() {
         return wrapper;
     }
 

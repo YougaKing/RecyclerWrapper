@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                 .fillView(new IFillViewProvider<View, String>() {
                     @Override
                     public View createView() {
-                        return LayoutInflater.from(mRecyclerView.getContext()).inflate(R.layout.fill_layout, null);
+                        return LayoutInflater.from(mRecyclerView.getContext()).inflate(R.layout.fill_layout, mRecyclerView, false);
                     }
 
                     @Override
@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
                 .footView(new IFootViewProvider<View, String>() {
                     @Override
                     public View createView() {
-                        return LayoutInflater.from(mRecyclerView.getContext()).inflate(R.layout.nav_header_main, null);
+                        return LayoutInflater.from(mRecyclerView.getContext()).inflate(R.layout.nav_header_main, mRecyclerView, false);
                     }
 
                     @Override
@@ -190,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
                         mAdapter.getDataList().clear();
                         mAdapter.getDataList().addAll(users);
                         mAdapter.notifyDataSetChanged();
-                        RecyclerWrapper.haveMore(users.size() >= 5, "已记载" + mAdapter.getFirstNumber() + "条");
+                        RecyclerWrapper.haveMore(users.size() >= 5, "已记载" + mAdapter.getItemCount() + "条");
                         if (users.size() == 0) {
                             RecyclerWrapper.showEmptyView("神马都没有");//显示请求结果为空时显示
                         }
@@ -199,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
                         if (mNotMore) users.remove(0);
                         mAdapter.getDataList().addAll(users);
                         mAdapter.notifyDataSetChanged();
-                        RecyclerWrapper.haveMore(users.size() >= 5, "已记载" + mAdapter.getFirstNumber() + "条");
+                        RecyclerWrapper.haveMore(users.size() >= 5, "已记载" + mAdapter.getItemCount() + "条");
                         break;
                 }
             }

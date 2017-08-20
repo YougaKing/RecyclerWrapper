@@ -33,6 +33,7 @@ public class FillView extends FrameLayout {
     public FillView(@NonNull Context context, @Nullable AttributeSet attrs, @AttrRes int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
+        setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
         ProgressBar progressBar = new ProgressBar(context, null, android.R.attr.progressBarStyleInverse);
         FrameLayout.LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -59,7 +60,7 @@ public class FillView extends FrameLayout {
         }
     }
 
-    public void showLoading(){
+    public void showLoading() {
         for (int i = 0; i < getChildCount(); i++) {
             View view = getChildAt(i);
             if (view instanceof TextView) {
