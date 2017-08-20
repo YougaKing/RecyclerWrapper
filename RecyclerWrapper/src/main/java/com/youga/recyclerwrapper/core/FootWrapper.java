@@ -22,13 +22,11 @@ public class FootWrapper<T extends View, K> {
     public @interface Type {
 
     }
-    boolean isLoading;
+
+    private boolean isLoading;
+    private K k;
 
     private IFootViewProvider<T, K> footView;
-
-    public FootWrapper(IFootViewProvider<T, K> footView) {
-        this.footView = footView;
-    }
 
     public IFootViewProvider<T, K> getFootView() {
         return footView;
@@ -52,5 +50,13 @@ public class FootWrapper<T extends View, K> {
 
     public void setLoading(boolean loading) {
         isLoading = loading;
+    }
+
+    public K getK() {
+        return k;
+    }
+
+    public void setK(K k) {
+        this.k = k;
     }
 }

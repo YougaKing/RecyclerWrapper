@@ -23,12 +23,9 @@ public class FillWrapper<T extends View, K> {
 
     }
 
+    private K k;
+
     private IFillViewProvider<T, K> fillView;
-
-
-    public FillWrapper(IFillViewProvider<T, K> fillView) {
-        this.fillView = fillView;
-    }
 
     public IFillViewProvider<T, K> getFillView() {
         return fillView;
@@ -44,5 +41,13 @@ public class FillWrapper<T extends View, K> {
 
     public void setType(int type) {
         mType = type;
+    }
+
+    public K getK() {
+        return k;
+    }
+
+    public void setK(K k) {
+        this.k = k;
     }
 }

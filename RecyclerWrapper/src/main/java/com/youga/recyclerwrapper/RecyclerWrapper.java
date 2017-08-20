@@ -51,19 +51,19 @@ public class RecyclerWrapper {
         return interaction.getWrapper();
     }
 
-    public static void showLoadView() {
+    public static <K> void showLoadView(K k) {
         if (getInstance().listener == null) return;
-        getInstance().listener.showLoadView();
+        getInstance().listener.showLoadView(k);
     }
 
-    public static void showErrorView() {
+    public static <K> void showErrorView(K k) {
         if (getInstance().listener == null) return;
-        getInstance().listener.showErrorView();
+        getInstance().listener.showErrorView(k);
     }
 
-    public static void showEmptyView() {
+    public static <K> void showEmptyView(K k) {
         if (getInstance().listener == null) return;
-        getInstance().listener.showEmptyView();
+        getInstance().listener.showEmptyView(k);
     }
 
     public static void showItemView() {
@@ -71,15 +71,15 @@ public class RecyclerWrapper {
         getInstance().listener.showItemView();
     }
 
-    public static void loadMoreFault() {
+    public static <K> void loadMoreFault(K k) {
         if (getInstance().listener == null) return;
-        getInstance().listener.loadMoreFault();
+        getInstance().listener.loadMoreFault(k);
     }
 
-    public static void haveMore(boolean haveMore) {
+    public static <K> void haveMore(boolean haveMore, K k) {
         if (getInstance().listener == null) return;
         if (haveMore) {
-            getInstance().listener.loadMoreEnable();
+            getInstance().listener.loadMoreEnable(k);
         } else {
             getInstance().listener.loadMoreNone();
         }

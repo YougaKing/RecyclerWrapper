@@ -3,7 +3,6 @@ package com.youga.recyclerwrapper.adapter;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -19,7 +18,6 @@ import com.youga.recyclerwrapper.core.InteractionListener;
  */
 public final class RealAdapter extends AdapterWrapper {
 
-    private static final String TAG = "RealAdapter";
     private InteractionListener.InternalListener mListener;
 
     public RealAdapter(@NonNull RecyclerView.Adapter adapter, InteractionListener.InternalListener listener) {
@@ -32,7 +30,11 @@ public final class RealAdapter extends AdapterWrapper {
         if (mListener.getFillType() != FillWrapper.NONE) {
             return 1;
         } else {
-            return mListener.getFootType() != FootWrapper.F_NONE ? super.getItemCount() + 1 : super.getItemCount();
+            if (mListener.loadMoreUnavailable()) {
+                return super.getItemCount();
+            } else {
+                return mListener.getFootType() != FootWrapper.F_NONE ? super.getItemCount() + 1 : super.getItemCount();
+            }
         }
     }
 
@@ -79,7 +81,6 @@ public final class RealAdapter extends AdapterWrapper {
         getAdapter().notifyDataSetChanged();
     }
 
-
     private class FillViewHolder extends RecyclerView.ViewHolder {
 
         FillViewHolder(View itemView) {
@@ -87,16 +88,16 @@ public final class RealAdapter extends AdapterWrapper {
         }
 
         void bindView() {
-            if (mWrapper.width == 0) {
+            if (mListener.getWidth() == 0) {
                 itemView.setVisibility(View.INVISIBLE);
                 itemView.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         if (itemView.getLayoutParams() == null) {
-                            itemView.setLayoutParams(new LayoutParams(mWrapper.width, mWrapper.height));
+                            itemView.setLayoutParams(new LayoutParams(mListener.getWidth(), mListener.getHeight()));
                         } else {
-                            itemView.getLayoutParams().width = mWrapper.width;
-                            itemView.getLayoutParams().height = mWrapper.height;
+                            itemView.getLayoutParams().width = mListener.getWidth();
+                            itemView.getLayoutParams().height = mListener.getHeight();
                         }
                         itemView.setVisibility(View.VISIBLE);
                         itemView.requestLayout();
@@ -106,22 +107,11 @@ public final class RealAdapter extends AdapterWrapper {
                 itemView.setVisibility(View.VISIBLE);
             }
 
-            switch (mWrapper.fillWrapper.getType()) {
-                case FillWrapper.LOAD:
-                    mWrapper.fillWrapper.getFillView().bindView(itemView, null, FillWrapper.LOAD);
-                    break;
-                case FillWrapper.EMPTY:
-                    mWrapper.fillWrapper.getFillView().bindView(itemView, null, FillWrapper.EMPTY);
-                    break;
-                case FillWrapper.ERROR:
-                    mWrapper.fillWrapper.getFillView().bindView(itemView, null, FillWrapper.ERROR);
-                    break;
-            }
+            mListener.bindFillView(itemView);
         }
     }
 
     private class FootViewHolder extends RecyclerView.ViewHolder {
-
 
         FootViewHolder(View itemView) {
             super(itemView);
@@ -129,12 +119,12 @@ public final class RealAdapter extends AdapterWrapper {
 
         void bindView() {
             if (itemView.getLayoutParams() == null) {
-                itemView.setLayoutParams(new LayoutParams(mWrapper.width, LayoutParams.WRAP_CONTENT));
+                itemView.setLayoutParams(new LayoutParams(mListener.getWidth(), LayoutParams.WRAP_CONTENT));
             } else {
-                itemView.getLayoutParams().width = mWrapper.width;
+                itemView.getLayoutParams().width = mListener.getWidth();
             }
-            if (mWrapper.layoutManager instanceof StaggeredGridLayoutManager) {
-                StaggeredGridLayoutManager.LayoutParams params = new StaggeredGridLayoutManager.LayoutParams(mWrapper.width, mWrapper.height);
+            if (mListener.getLayoutManager() instanceof StaggeredGridLayoutManager) {
+                StaggeredGridLayoutManager.LayoutParams params = new StaggeredGridLayoutManager.LayoutParams(mListener.getWidth(), LayoutParams.WRAP_CONTENT);
                 params.setFullSpan(true);
                 itemView.setLayoutParams(params);
             }
@@ -142,28 +132,10 @@ public final class RealAdapter extends AdapterWrapper {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mWrapper.footWrapper.getType() != FootWrapper.F_FAULT || mWrapper.footWrapper.isLoading())
-                        return;
-                    mWrapper.footWrapper.setType(FootWrapper.F_LOAD);
-                    mWrapper.footWrapper.setLoading(true);
-                    mWrapper.loadMoreListener.onLoadMore(getAdapter().getItemCount());
-                    mWrapper.footWrapper.getFootView().bindView(itemView, null, FootWrapper.F_LOAD);
-                    getAdapter().notifyDataSetChanged();
+                    mListener.footViewClick(itemView, getAdapter().getItemCount());
                 }
             });
-
-            switch (mWrapper.footWrapper.getType()) {
-                case FootWrapper.F_LOAD:
-                    if (!mWrapper.footWrapper.isLoading()) {
-                        mWrapper.footWrapper.setLoading(true);
-                        mWrapper.loadMoreListener.onLoadMore(getAdapter().getItemCount());
-                    }
-                    mWrapper.footWrapper.getFootView().bindView(itemView, null, FootWrapper.F_LOAD);
-                    break;
-                case FootWrapper.F_FAULT:
-                    mWrapper.footWrapper.getFootView().bindView(itemView, null, FootWrapper.F_FAULT);
-                    break;
-            }
+            mListener.bindFootView(itemView, getAdapter().getItemCount());
         }
     }
 }

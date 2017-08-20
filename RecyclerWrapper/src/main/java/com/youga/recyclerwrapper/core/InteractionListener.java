@@ -1,5 +1,6 @@
 package com.youga.recyclerwrapper.core;
 
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 /**
@@ -17,21 +18,35 @@ public interface InteractionListener {
         View getFillView();
 
         View getFootView();
+
+        int getWidth();
+
+        int getHeight();
+
+        RecyclerView.LayoutManager getLayoutManager();
+
+        void bindFillView(View view);
+
+        void bindFootView(View view, int position);
+
+        void footViewClick(View view, int position);
+
+        boolean loadMoreUnavailable();
     }
 
     interface RevealListener {
 
-        void showLoadView();
+        <K> void showLoadView(K k);
 
-        void showErrorView();
+        <K> void showErrorView(K k);
 
-        void showEmptyView();
+        <K> void showEmptyView(K k);
 
         void showItemView();
 
-        void loadMoreFault();
+        <K> void loadMoreFault(K k);
 
-        void loadMoreEnable();
+        <K> void loadMoreEnable(K k);
 
         void loadMoreNone();
     }

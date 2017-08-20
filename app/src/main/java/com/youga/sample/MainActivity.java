@@ -7,6 +7,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -16,12 +17,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
 import com.google.gson.reflect.TypeToken;
 import com.youga.recyclerwrapper.LoadMoreListener;
 import com.youga.recyclerwrapper.RecyclerWrapper;
+import com.youga.recyclerwrapper.core.FillWrapper;
+import com.youga.recyclerwrapper.core.FootWrapper;
+import com.youga.recyclerwrapper.view.IFillViewProvider;
+import com.youga.recyclerwrapper.view.IFootViewProvider;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -62,15 +68,15 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.refresh:
                         mNotMore = false;
                         requestList(REFRESH, 0);
-                        RecyclerWrapper.showLoadView();//加载显示ProgressBar
+                        RecyclerWrapper.showLoadView("手动刷新加载中....");//加载显示ProgressBar
                         break;
                     case R.id.empty:
                         mAdapter.getDataList().clear();
-                        RecyclerWrapper.showEmptyView();//显示请求结果为空时显示
+                        RecyclerWrapper.showEmptyView("手动显示空布局");//显示请求结果为空时显示
                         break;
                     case R.id.error:
                         mAdapter.getDataList().clear();
-                        RecyclerWrapper.showErrorView();//显示请求错误时显示
+                        RecyclerWrapper.showErrorView("手动显示加载错误");//显示请求错误时显示
                         break;
                     case R.id.not_more:
                         mNotMore = true;
@@ -88,14 +94,56 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(mAdapter);
 
-        RecyclerWrapper.with(mRecyclerView).wrapper(new LoadMoreListener() {
-            @Override
-            public void onLoadMore(int position) {
-                onDrag();
-            }
-        });
+        RecyclerWrapper.with(mRecyclerView)
+                .fillView(new IFillViewProvider<View, String>() {
+                    @Override
+                    public View createView() {
+                        return LayoutInflater.from(mRecyclerView.getContext()).inflate(R.layout.fill_layout, null);
+                    }
 
-        RecyclerWrapper.showLoadView();
+                    @Override
+                    public void bindView(View view, String string, @FillWrapper.Type int type) {
+                        TextView textView = (TextView) view.findViewById(R.id.text);
+                        switch (type) {
+                            case FillWrapper.LOAD:
+                                textView.setText("FillWrapper.LOAD:" + string);
+                                break;
+                            case FillWrapper.EMPTY:
+                                textView.setText("FillWrapper.EMPTY:" + string);
+                                break;
+                            case FillWrapper.ERROR:
+                                textView.setText("FillWrapper.ERROR:" + string);
+                                break;
+                        }
+                    }
+                })
+                .footView(new IFootViewProvider<View, String>() {
+                    @Override
+                    public View createView() {
+                        return LayoutInflater.from(mRecyclerView.getContext()).inflate(R.layout.nav_header_main, null);
+                    }
+
+                    @Override
+                    public void bindView(View view, String string, @FootWrapper.Type int type) {
+                        TextView textView = (TextView) view.findViewById(R.id.textView);
+                        switch (type) {
+                            case FootWrapper.F_LOAD:
+                                textView.setText("FootWrapper.F_LOAD:" + string);
+                                break;
+                            case FootWrapper.F_FAULT:
+                                textView.setText("FootWrapper.F_FAULT:" + string);
+                                break;
+                        }
+                    }
+                })
+                .wrapper(new LoadMoreListener() {
+                    @Override
+                    public void onLoadMore(int position) {
+                        onDrag();
+                    }
+                });
+
+        RecyclerWrapper.showLoadView("第一次加载中....");
         requestList(REFRESH, 0);
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -124,11 +172,11 @@ public class MainActivity extends AppCompatActivity {
                         mSwipeRefreshLayout.setEnabled(true);
                         mSwipeRefreshLayout.setRefreshing(false);
                         showToast(message);
-                        RecyclerWrapper.showErrorView();//显示请求结果为空时显示
+                        RecyclerWrapper.showErrorView(message);
                         break;
                     case LOAD_MORE:
                         showToast(message);
-                        RecyclerWrapper.loadMoreFault();
+                        RecyclerWrapper.loadMoreFault(message);
                         break;
                 }
             }
@@ -142,16 +190,16 @@ public class MainActivity extends AppCompatActivity {
                         mAdapter.getDataList().clear();
                         mAdapter.getDataList().addAll(users);
                         mAdapter.notifyDataSetChanged();
-                        RecyclerWrapper.haveMore(users.size() >= 5);
+                        RecyclerWrapper.haveMore(users.size() >= 5, "已记载" + mAdapter.getFirstNumber() + "条");
                         if (users.size() == 0) {
-                            RecyclerWrapper.showEmptyView();//显示请求结果为空时显示
+                            RecyclerWrapper.showEmptyView("神马都没有");//显示请求结果为空时显示
                         }
                         break;
                     case LOAD_MORE:
                         if (mNotMore) users.remove(0);
                         mAdapter.getDataList().addAll(users);
                         mAdapter.notifyDataSetChanged();
-                        RecyclerWrapper.haveMore(users.size() >= 5);
+                        RecyclerWrapper.haveMore(users.size() >= 5, "已记载" + mAdapter.getFirstNumber() + "条");
                         break;
                 }
             }
