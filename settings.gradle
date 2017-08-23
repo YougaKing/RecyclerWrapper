@@ -1,1 +1,1 @@
-include ':app', ':RecyclerWrapper'
+include ':app', ':recyclerwrapper'

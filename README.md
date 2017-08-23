@@ -60,8 +60,8 @@ compile 'com.youga.recyclerwrapper:RecyclerWrapper:0.1'
 
 #### 版本
 * gradlew bintrayupload
-* versionCode 4
-* versionName '1.1.3'
+* versionCode 1
+* versionName '0.1'
 
 # 关于作者
 * QQ交流群:158506055

@@ -3,8 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/RecyclerWrapper.iml" filepath="$PROJECT_DIR$/RecyclerWrapper.iml" />
-      <module fileurl="file://$PROJECT_DIR$/RecyclerWrapper/RecyclerWrapper-RecyclerWrapper.iml" filepath="$PROJECT_DIR$/RecyclerWrapper/RecyclerWrapper-RecyclerWrapper.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/recyclerwrapper/recyclerwrapper.iml" filepath="$PROJECT_DIR$/recyclerwrapper/recyclerwrapper.iml" />
     </modules>
   </component>
 </project>
