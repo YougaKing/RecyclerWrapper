@@ -16,6 +16,8 @@ import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.youga.recyclerwrapper.R;
+
 /**
  * Created by Youga on 2017/8/18.
  */
@@ -47,12 +49,12 @@ public class FillView extends FrameLayout {
     }
 
 
-    public void showEmpty(String text) {
+    public void showEmpty() {
         for (int i = 0; i < getChildCount(); i++) {
             View view = getChildAt(i);
             if (view instanceof TextView) {
                 view.setVisibility(VISIBLE);
-                ((TextView) view).setText(text);
+                ((TextView) view).setText(getResources().getString(R.string.string_empty));
                 ((TextView) view).setCompoundDrawablesWithIntrinsicBounds(null, getAppIcon(), null, null);
             } else if (view instanceof ProgressBar) {
                 view.setVisibility(GONE);
@@ -60,12 +62,12 @@ public class FillView extends FrameLayout {
         }
     }
 
-    public void showError(String text) {
+    public void showError() {
         for (int i = 0; i < getChildCount(); i++) {
             View view = getChildAt(i);
             if (view instanceof TextView) {
                 view.setVisibility(VISIBLE);
-                ((TextView) view).setText(text);
+                ((TextView) view).setText(getResources().getString(R.string.string_error));
                 ((TextView) view).setCompoundDrawablesWithIntrinsicBounds(null, getAppIcon(), null, null);
             } else if (view instanceof ProgressBar) {
                 view.setVisibility(GONE);

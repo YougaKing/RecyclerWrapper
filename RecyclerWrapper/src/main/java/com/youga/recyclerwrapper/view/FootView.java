@@ -13,6 +13,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.youga.recyclerwrapper.R;
+
 /**
  * Created by Youga on 2017/8/18.
  */
@@ -44,12 +46,12 @@ public class FootView extends LinearLayout {
     }
 
 
-    public void showFault(String text) {
+    public void showFault() {
         for (int i = 0; i < getChildCount(); i++) {
             View view = getChildAt(i);
             if (view instanceof TextView) {
                 view.setVisibility(VISIBLE);
-                ((TextView) view).setText(text);
+                ((TextView) view).setText(getResources().getString(R.string.string_load_more));
             } else if (view instanceof ProgressBar) {
                 view.setVisibility(GONE);
             }

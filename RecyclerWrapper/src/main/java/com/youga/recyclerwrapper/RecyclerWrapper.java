@@ -74,9 +74,9 @@ public class RecyclerWrapper {
                     if (type == FillWrapper.LOAD) {
                         fillView.showLoading();
                     } else if (type == FillWrapper.EMPTY) {
-                        fillView.showEmpty("什么都没有");
+                        fillView.showEmpty();
                     } else {
-                        fillView.showError("网络出现问题了");
+                        fillView.showError();
                     }
                 }
             };
@@ -94,7 +94,7 @@ public class RecyclerWrapper {
                     if (type == FootWrapper.F_LOAD) {
                         footView.showLoading();
                     } else {
-                        footView.showFault("点击加载更多...");
+                        footView.showFault();
                     }
                 }
             };
