@@ -16,9 +16,22 @@
   <type>pom</type>
 </dependency>
 ```
-* or Gradle:
+* JitPack:
 ```
-compile 'com.youga.recyclerwrapper:RecyclerWrapper:0.1'
+	allprojects {
+		repositories {
+			maven { url 'https://jitpack.io' }
+		}
+	}
+
+	dependencies {
+	        compile 'com.github.YougaKing:RecyclerWrapper:0.0.1'
+	}
+```
+
+* or jcenter:
+```
+compile 'com.youga.recyclerwrapper:recyclerwrapper:0.0.1'
 ```
 #### 使用方法
 ```
