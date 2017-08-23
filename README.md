@@ -11,15 +11,15 @@ Demo演示 [下载](https://github.com/YougaKing/DragRecyclerView/blob/master/Re
 * Download the latest JAR or grab via Maven:
 ```xml
 <dependency>
-  <groupId>com.youga.recyclerview</groupId>
-  <artifactId>dragrecyclerview</artifactId>
-  <version>1.1.3</version>
+  <groupId>com.youga.recyclerwrapper</groupId>
+  <artifactId>RecyclerWrapper</artifactId>
+  <version>0.1</version>
   <type>pom</type>
 </dependency>
 ```
 * or Gradle:
 ```
-compile 'com.youga.recyclerview:dragrecyclerview:1.1.3'
+compile 'com.youga.recyclerwrapper:RecyclerWrapper:0.1'
 ```
 #### 代码片段
 ```
