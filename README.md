@@ -1,11 +1,10 @@
 # DragRecyclerView
 
-
-![主页](https://github.com/YougaKing/DragRecyclerView/blob/master/Res/grid.png)
-![主页](https://github.com/YougaKing/DragRecyclerView/blob/master/Res/stage_grid.png)
-![主页](https://github.com/YougaKing/DragRecyclerView/blob/master/Res/haha.gif)
-
-Demo演示 [下载](https://github.com/YougaKing/DragRecyclerView/blob/master/Res/app-release.apk)
+#### 功能描述
+* RecyclerWrapper 是一个零侵入性为RecyclerView提供加载更多、EmptyView的开源库,可搭配SwipeRefreshLayout 下拉刷新
+* 支持EmptyView loading error 图片文字可自定义
+* 支持LinearLayoutManager GridLayoutManager StaggeredGridLayoutManager
+* 支持HORIZONTAL VERTICAL
 
 #### Download
 * Download the latest JAR or grab via Maven:
@@ -21,47 +20,91 @@ Demo演示 [下载](https://github.com/YougaKing/DragRecyclerView/blob/master/Re
 ```
 compile 'com.youga.recyclerwrapper:RecyclerWrapper:0.1'
 ```
-#### 代码片段
-```
- if (id == R.id.lm_hor) {
-     mAdapter = new RecyclerViewAdapter(this, null);
-     mDragRecyclerView.setAdapter(mAdapter, true, new LinearLayoutManager(this,
-             LinearLayoutManager.HORIZONTAL, false));
- } else if (id == R.id.lm_ver) {
-     mAdapter = new RecyclerViewAdapter(this, null);
-     mDragRecyclerView.setAdapter(mAdapter, true, new LinearLayoutManager(this,
-             LinearLayoutManager.VERTICAL, false));
- } else if (id == R.id.glm_hor) {
-     mAdapter = new StaggeredGridAdapter(this, null, false);
-     mDragRecyclerView.setAdapter(mAdapter, true, new GridLayoutManager(this, 4,
-             GridLayoutManager.HORIZONTAL, false));
- } else if (id == R.id.glm_ver) {
-     mAdapter = new StaggeredGridAdapter(this, null, false);
-     mDragRecyclerView.setAdapter(mAdapter, true, new GridLayoutManager(this, 4,
-             GridLayoutManager.VERTICAL, false));
- } else if (id == R.id.sglm_hor) {
-     mAdapter = new StaggeredGridAdapter(this, null, true);
-     mDragRecyclerView.setAdapter(mAdapter, true,
-             new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.HORIZONTAL));
- } else if (id == R.id.sglm_ver) {
-     mAdapter = new StaggeredGridAdapter(this, null, true);
-     mDragRecyclerView.setAdapter(mAdapter, true,
-             new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL));
- }
-
+#### 使用方法
 ```
 
+ RecyclerWrapper.with(mRecyclerView)
+                //自定义FillView
+               .fillView(new IFillViewProvider<View, String>() {
+                                 @Override
+                                 public View createView() {
+                                     return LayoutInflater.from(mRecyclerView.getContext()).inflate(R.layout.fill_layout, mRecyclerView, false);
+                                 }
+             
+                                 @Override
+                                 public void bindView(View view, String string, @FillWrapper.Type int type) {
+                                     TextView textView = (TextView) view.findViewById(R.id.text);
+                                     switch (type) {
+                                         case FillWrapper.LOAD://加载状态
+                                             textView.setText("FillWrapper.LOAD:" + string);
+                                             break;
+                                         case FillWrapper.EMPTY://数据为空
+                                             textView.setText("FillWrapper.EMPTY:" + string);
+                                             break;
+                                         case FillWrapper.ERROR://网络错误
+                                             textView.setText("FillWrapper.ERROR:" + string);
+                                             break;
+                                     }
+                                 }
+                             })
+                //自定义FootView
+               .footView(new IFootViewProvider<View, String>() {
+                                 @Override
+                                 public View createView() {
+                                     return LayoutInflater.from(mRecyclerView.getContext()).inflate(R.layout.nav_header_main, mRecyclerView, false);
+                                 }
+             
+                                 @Override
+                                 public void bindView(View view, String string, @FootWrapper.Type int type) {
+                                     TextView textView = (TextView) view.findViewById(R.id.textView);
+                                     switch (type) {
+                                         case FootWrapper.F_LOAD://加载状态
+                                             textView.setText("FootWrapper.F_LOAD:" + string);
+                                             break;
+                                         case FootWrapper.F_FAULT://网络错误
+                                             textView.setText("FootWrapper.F_FAULT:" + string);
+                                             break;
+                                     }
+                                 }
+                             })
+                 //加载更多回掉
+                .wrapper(new LoadMoreListener() {
+                    @Override
+                    public void onLoadMore(int position) {
+                        onDrag();
+                    }
+                })
 
-#### 功能
-* RecyclerView 加载更多,可搭配SwipeRefreshLayout 下拉刷新
-* 支持EmptyView loading error 图片文字可自定义
-* 支持LinearLayoutManager GridLayoutManager StaggeredGridLayoutManager
-* 支持HORIZONTAL VERTICAL
+
+
+设置全局FillView/FootView
+RecyclerWrapper.registerFillViewProvider();
+RecyclerWrapper.registerFootViewProvider();
+
+
+显示各种状态
+mRevealListener = RecyclerWrapper.with(mRecyclerView)
+                .wrapper(new LoadMoreListener() {
+                    @Override
+                    public void onLoadMore(int position) {
+                        onDrag();
+                    }
+                });
+
+mRevealListener.showLoadView(null);
+mRevealListener.showErrorView(null);
+mRevealListener.showEmptyView(null)
+
+数据是否还有更多
+mRevealListener.haveMore(users.size() >= 5, null)
+
+
+```
+
 
 #### 版本
-* gradlew bintrayupload
 * versionCode 1
-* versionName '0.1'
+* versionName '0.0.1'
 
 # 关于作者
 * QQ交流群:158506055

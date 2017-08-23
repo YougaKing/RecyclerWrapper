@@ -26,6 +26,7 @@ import com.youga.recyclerwrapper.LoadMoreListener;
 import com.youga.recyclerwrapper.RecyclerWrapper;
 import com.youga.recyclerwrapper.core.FillWrapper;
 import com.youga.recyclerwrapper.core.FootWrapper;
+import com.youga.recyclerwrapper.core.InteractionListener;
 import com.youga.recyclerwrapper.view.IFillViewProvider;
 import com.youga.recyclerwrapper.view.IFootViewProvider;
 
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private boolean mNotMore;
+    private InteractionListener.RevealListener mRevealListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,15 +70,15 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.refresh:
                         mNotMore = false;
                         requestList(REFRESH, 0);
-                        RecyclerWrapper.showLoadView("手动刷新加载中....");//加载显示ProgressBar
+                        mRevealListener.showLoadView(null);
                         break;
                     case R.id.empty:
                         mAdapter.getDataList().clear();
-                        RecyclerWrapper.showEmptyView("手动显示空布局");//显示请求结果为空时显示
+                        mRevealListener.showEmptyView(null);
                         break;
                     case R.id.error:
                         mAdapter.getDataList().clear();
-                        RecyclerWrapper.showErrorView("手动显示加载错误");//显示请求错误时显示
+                        mRevealListener.showErrorView(null);
                         break;
                     case R.id.not_more:
                         mNotMore = true;
@@ -94,48 +96,7 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(mAdapter);
 
-        RecyclerWrapper.with(mRecyclerView)
-                .fillView(new IFillViewProvider<View, String>() {
-                    @Override
-                    public View createView() {
-                        return LayoutInflater.from(mRecyclerView.getContext()).inflate(R.layout.fill_layout, mRecyclerView, false);
-                    }
-
-                    @Override
-                    public void bindView(View view, String string, @FillWrapper.Type int type) {
-                        TextView textView = (TextView) view.findViewById(R.id.text);
-                        switch (type) {
-                            case FillWrapper.LOAD:
-                                textView.setText("FillWrapper.LOAD:" + string);
-                                break;
-                            case FillWrapper.EMPTY:
-                                textView.setText("FillWrapper.EMPTY:" + string);
-                                break;
-                            case FillWrapper.ERROR:
-                                textView.setText("FillWrapper.ERROR:" + string);
-                                break;
-                        }
-                    }
-                })
-                .footView(new IFootViewProvider<View, String>() {
-                    @Override
-                    public View createView() {
-                        return LayoutInflater.from(mRecyclerView.getContext()).inflate(R.layout.nav_header_main, mRecyclerView, false);
-                    }
-
-                    @Override
-                    public void bindView(View view, String string, @FootWrapper.Type int type) {
-                        TextView textView = (TextView) view.findViewById(R.id.textView);
-                        switch (type) {
-                            case FootWrapper.F_LOAD:
-                                textView.setText("FootWrapper.F_LOAD:" + string);
-                                break;
-                            case FootWrapper.F_FAULT:
-                                textView.setText("FootWrapper.F_FAULT:" + string);
-                                break;
-                        }
-                    }
-                })
+        mRevealListener = RecyclerWrapper.with(mRecyclerView)
                 .wrapper(new LoadMoreListener() {
                     @Override
                     public void onLoadMore(int position) {
@@ -143,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        RecyclerWrapper.showLoadView("第一次加载中....");
+        mRevealListener.showLoadView(null);
         requestList(REFRESH, 0);
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -172,11 +133,11 @@ public class MainActivity extends AppCompatActivity {
                         mSwipeRefreshLayout.setEnabled(true);
                         mSwipeRefreshLayout.setRefreshing(false);
                         showToast(message);
-                        RecyclerWrapper.showErrorView(message);
+                        mRevealListener.showErrorView(null);
                         break;
                     case LOAD_MORE:
                         showToast(message);
-                        RecyclerWrapper.loadMoreFault(message);
+                        mRevealListener.showErrorView(null);
                         break;
                 }
             }
@@ -190,16 +151,16 @@ public class MainActivity extends AppCompatActivity {
                         mAdapter.getDataList().clear();
                         mAdapter.getDataList().addAll(users);
                         mAdapter.notifyDataSetChanged();
-                        RecyclerWrapper.haveMore(users.size() >= 5, "已记载" + mAdapter.getItemCount() + "条");
+                        mRevealListener.haveMore(users.size() >= 5, null);
                         if (users.size() == 0) {
-                            RecyclerWrapper.showEmptyView("神马都没有");//显示请求结果为空时显示
+                            mRevealListener.showEmptyView(null);//显示请求结果为空时显示
                         }
                         break;
                     case LOAD_MORE:
                         if (mNotMore) users.remove(0);
                         mAdapter.getDataList().addAll(users);
                         mAdapter.notifyDataSetChanged();
-                        RecyclerWrapper.haveMore(users.size() >= 5, "已记载" + mAdapter.getItemCount() + "条");
+                        mRevealListener.haveMore(users.size() >= 5, null);
                         break;
                 }
             }
@@ -222,59 +183,6 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
-//
-//    @SuppressWarnings("StatementWithEmptyBody")
-//    @Override
-//    public boolean onNavigationItemSelected(MenuItem item) {
-//        int id = item.getItemId();
-//        if (id == R.id.lm_hor) {
-//            mAdapter = new RecyclerViewAdapter(this);
-//            mDragRecyclerView.setAdapter(mAdapter, true, new LinearLayoutManager(this,
-//                    LinearLayoutManager.HORIZONTAL, false));
-//        } else if (id == R.id.lm_ver) {
-//            mAdapter = new RecyclerViewAdapter(this);
-//            mDragRecyclerView.setAdapter(mAdapter, true, new LinearLayoutManager(this,
-//                    LinearLayoutManager.VERTICAL, false));
-//        } else if (id == R.id.glm_hor) {
-//            mAdapter = new StaggeredGridAdapter(this, false);
-//            mDragRecyclerView.setAdapter(mAdapter, true, new GridLayoutManager(this, 4,
-//                    GridLayoutManager.HORIZONTAL, false));
-//        } else if (id == R.id.glm_ver) {
-//            mAdapter = new StaggeredGridAdapter(this, false);
-//            mDragRecyclerView.setAdapter(mAdapter, true, new GridLayoutManager(this, 4,
-//                    GridLayoutManager.VERTICAL, false));
-//        } else if (id == R.id.sglm_hor) {
-//            mAdapter = new StaggeredGridAdapter(this, true);
-//            mDragRecyclerView.setAdapter(mAdapter, true,
-//                    new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.HORIZONTAL));
-//        } else if (id == R.id.sglm_ver) {
-//            mAdapter = new StaggeredGridAdapter(this, true);
-//            mDragRecyclerView.setAdapter(mAdapter, true,
-//                    new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL));
-//        }
-//        mDragRecyclerView.showLoadingView();
-//        mNotMore = false;
-//        requestList(REFRESH, 0);
-//
-//        mDragRecyclerView.setOnDragListener(new DragRecyclerView.OnDragListener() {
-//            @Override
-//            public void onLoadMore() {
-//                onDrag();
-//            }
-//        });
-//
-//
-//        mDragRecyclerView.setOnItemClickListener(new DragRecyclerView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(View view, int position) {
-//                Toast.makeText(MainActivity.this, "position:" + position, Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//
-//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        drawer.closeDrawer(GravityCompat.START);
-//        return true;
-//    }
 
     void showToast(String message) {
         Snackbar.make(toolbar, message, Snackbar.LENGTH_SHORT).show();
