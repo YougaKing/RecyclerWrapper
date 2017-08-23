@@ -47,7 +47,20 @@ public class FillView extends FrameLayout {
     }
 
 
-    public void showTips(String text) {
+    public void showEmpty(String text) {
+        for (int i = 0; i < getChildCount(); i++) {
+            View view = getChildAt(i);
+            if (view instanceof TextView) {
+                view.setVisibility(VISIBLE);
+                ((TextView) view).setText(text);
+                ((TextView) view).setCompoundDrawablesWithIntrinsicBounds(null, getAppIcon(), null, null);
+            } else if (view instanceof ProgressBar) {
+                view.setVisibility(GONE);
+            }
+        }
+    }
+
+    public void showError(String text) {
         for (int i = 0; i < getChildCount(); i++) {
             View view = getChildAt(i);
             if (view instanceof TextView) {

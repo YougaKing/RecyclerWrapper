@@ -14,6 +14,9 @@ import com.youga.recyclerwrapper.view.FootView;
 import com.youga.recyclerwrapper.view.IFillViewProvider;
 import com.youga.recyclerwrapper.view.IFootViewProvider;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * Created by Youga on 2017/8/17.
@@ -47,43 +50,7 @@ public class RecyclerWrapper {
         }
         initDefaultView(recyclerView.getContext().getApplicationContext());
         Interaction interaction = new Interaction(recyclerView);
-        getInstance().listener = interaction;
         return interaction.getWrapper();
-    }
-
-    public static <K> void showLoadView(K k) {
-        if (getInstance().listener == null) return;
-        getInstance().listener.showLoadView(k);
-    }
-
-    public static <K> void showErrorView(K k) {
-        if (getInstance().listener == null) return;
-        getInstance().listener.showErrorView(k);
-    }
-
-    public static <K> void showEmptyView(K k) {
-        if (getInstance().listener == null) return;
-        getInstance().listener.showEmptyView(k);
-    }
-
-    public static void showItemView() {
-        if (getInstance().listener == null) return;
-        getInstance().listener.showItemView();
-    }
-
-    public static <K> void loadMoreFault(K k) {
-        if (getInstance().listener == null) return;
-        getInstance().listener.loadMoreFault(k);
-    }
-
-    public static <K> void haveMore(boolean haveMore, K k) {
-        if (getInstance().listener == null) return;
-        if (haveMore) {
-            getInstance().listener.loadMoreEnable(k);
-        } else {
-            getInstance().listener.loadMoreNone();
-        }
-        showItemView();
     }
 
     public static <T extends View, K> void registerFillViewProvider(IFillViewProvider<T, K> view) {
@@ -107,9 +74,9 @@ public class RecyclerWrapper {
                     if (type == FillWrapper.LOAD) {
                         fillView.showLoading();
                     } else if (type == FillWrapper.EMPTY) {
-                        fillView.showTips(s);
+                        fillView.showEmpty("什么都没有");
                     } else {
-                        fillView.showTips(s);
+                        fillView.showError("网络出现问题了");
                     }
                 }
             };
@@ -127,7 +94,7 @@ public class RecyclerWrapper {
                     if (type == FootWrapper.F_LOAD) {
                         footView.showLoading();
                     } else {
-                        footView.showFault(s);
+                        footView.showFault("点击加载更多...");
                     }
                 }
             };

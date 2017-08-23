@@ -3,6 +3,8 @@ package com.youga.recyclerwrapper.adapter;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -104,9 +106,16 @@ public final class RealAdapter extends AdapterWrapper {
                     }
                 }, 500);
             } else {
+                if (itemView.getLayoutParams() == null) {
+                    itemView.setLayoutParams(new LayoutParams(mListener.getWidth(), mListener.getHeight()));
+                } else {
+                    itemView.getLayoutParams().width = mListener.getWidth();
+                    itemView.getLayoutParams().height = mListener.getHeight();
+                }
+                itemView.setVisibility(View.VISIBLE);
+                itemView.requestLayout();
                 itemView.setVisibility(View.VISIBLE);
             }
-
             mListener.bindFillView(itemView);
         }
     }
@@ -118,13 +127,15 @@ public final class RealAdapter extends AdapterWrapper {
         }
 
         void bindView() {
+            int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, itemView.getResources().getDisplayMetrics());
             if (itemView.getLayoutParams() == null) {
-                itemView.setLayoutParams(new LayoutParams(mListener.getWidth(), LayoutParams.WRAP_CONTENT));
+                itemView.setLayoutParams(new LayoutParams(mListener.getWidth(), height));
             } else {
                 itemView.getLayoutParams().width = mListener.getWidth();
+                itemView.getLayoutParams().height = height;
             }
             if (mListener.getLayoutManager() instanceof StaggeredGridLayoutManager) {
-                StaggeredGridLayoutManager.LayoutParams params = new StaggeredGridLayoutManager.LayoutParams(mListener.getWidth(), LayoutParams.WRAP_CONTENT);
+                StaggeredGridLayoutManager.LayoutParams params = new StaggeredGridLayoutManager.LayoutParams(mListener.getWidth(), height);
                 params.setFullSpan(true);
                 itemView.setLayoutParams(params);
             }

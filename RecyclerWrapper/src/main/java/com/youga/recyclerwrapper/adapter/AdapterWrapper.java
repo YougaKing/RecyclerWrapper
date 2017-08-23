@@ -105,7 +105,7 @@ class AdapterWrapper extends RecyclerView.Adapter {
         mAdapter.onDetachedFromRecyclerView(recyclerView);
     }
 
-    RecyclerView.Adapter<RecyclerView.ViewHolder> getAdapter() {
+   public RecyclerView.Adapter<RecyclerView.ViewHolder> getAdapter() {
         return mAdapter;
     }
 }

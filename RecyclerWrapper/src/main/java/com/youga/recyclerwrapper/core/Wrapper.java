@@ -16,5 +16,5 @@ public interface Wrapper {
 
     <T extends View, K> Wrapper footView(IFootViewProvider<T, K> view);
 
-    void wrapper(LoadMoreListener listener);
+    InteractionListener.RevealListener wrapper(LoadMoreListener listener);
 }

@@ -46,8 +46,6 @@ public interface InteractionListener {
 
         <K> void loadMoreFault(K k);
 
-        <K> void loadMoreEnable(K k);
-
-        void loadMoreNone();
+        <K> void haveMore(boolean haveMore, K k);
     }
 }

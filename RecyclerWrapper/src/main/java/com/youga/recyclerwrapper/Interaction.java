@@ -1,6 +1,8 @@
 package com.youga.recyclerwrapper;
 
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 
 import com.youga.recyclerwrapper.core.InteractionListener;
@@ -10,6 +12,9 @@ import com.youga.recyclerwrapper.core.FootWrapper;
 import com.youga.recyclerwrapper.core.Wrapper;
 import com.youga.recyclerwrapper.view.IFillViewProvider;
 import com.youga.recyclerwrapper.view.IFootViewProvider;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Youga on 2017/8/17.
@@ -81,16 +86,16 @@ class Interaction implements Wrapper, InteractionListener.RevealListener, Intera
     }
 
     @Override
-    public <K> void loadMoreEnable(K k) {
-        footWrapper.setK(k);
-        footWrapper.setType(FootWrapper.F_LOAD);
-        realAdapter.internalNotify();
-    }
-
-    @Override
-    public void loadMoreNone() {
-        footWrapper.setType(FootWrapper.F_NONE);
-        realAdapter.internalNotify();
+    public <K> void haveMore(boolean haveMore, K k) {
+        if (haveMore) {
+            footWrapper.setK(k);
+            footWrapper.setType(FootWrapper.F_LOAD);
+            realAdapter.internalNotify();
+        } else {
+            footWrapper.setType(FootWrapper.F_NONE);
+            realAdapter.internalNotify();
+        }
+        showItemView();
     }
 
     @Override
@@ -144,14 +149,14 @@ class Interaction implements Wrapper, InteractionListener.RevealListener, Intera
     }
 
     @Override
-    public void bindFootView(View view, int position) {
+    public void bindFootView(View view, final int position) {
         switch (footWrapper.getType()) {
             case FootWrapper.F_LOAD:
+                footWrapper.getFootView().bindView(view, footWrapper.getK(), FootWrapper.F_LOAD);
                 if (!footWrapper.isLoading()) {
                     footWrapper.setLoading(true);
                     if (mLoadMoreListener != null) mLoadMoreListener.onLoadMore(position);
                 }
-                footWrapper.getFootView().bindView(view, footWrapper.getK(), FootWrapper.F_LOAD);
                 break;
             case FootWrapper.F_FAULT:
                 footWrapper.getFootView().bindView(view, footWrapper.getK(), FootWrapper.F_FAULT);
@@ -160,14 +165,14 @@ class Interaction implements Wrapper, InteractionListener.RevealListener, Intera
     }
 
     @Override
-    public void footViewClick(View view, int position) {
+    public void footViewClick(View view, final int position) {
         if (footWrapper.getType() != FootWrapper.F_FAULT || footWrapper.isLoading())
             return;
         footWrapper.setType(FootWrapper.F_LOAD);
         footWrapper.setLoading(true);
-        if (mLoadMoreListener != null) mLoadMoreListener.onLoadMore(position);
         footWrapper.getFootView().bindView(view, null, FootWrapper.F_LOAD);
         realAdapter.internalNotify();
+        if (mLoadMoreListener != null) mLoadMoreListener.onLoadMore(position);
     }
 
     @Override
@@ -192,8 +197,25 @@ class Interaction implements Wrapper, InteractionListener.RevealListener, Intera
     }
 
     @Override
-    public void wrapper(LoadMoreListener listener) {
+    public InteractionListener.RevealListener wrapper(LoadMoreListener listener) {
         mLoadMoreListener = listener;
+        if (recyclerView.getLayoutManager() instanceof GridLayoutManager) {
+            final GridLayoutManager manager = (GridLayoutManager) recyclerView.getLayoutManager();
+            manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                @Override
+
+                public int getSpanSize(int position) {
+                    if (position == 0 && getFillType() != FillWrapper.NONE) {
+                        return manager.getSpanCount();
+                    } else if (position == realAdapter.getAdapter().getItemCount() && mLoadMoreListener != null) {
+                        return manager.getSpanCount();
+                    } else {
+                        return 1;
+                    }
+                }
+            });
+        }
         recyclerView.setAdapter(realAdapter);
+        return this;
     }
 }
