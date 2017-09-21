@@ -92,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mAdapter);
 
         mRevealListener = RecyclerWrapper.with(mRecyclerView)
-                .addHeaderView(new HeaderViewProvider())
                 .wrapper(new LoadMoreListener() {
                     @Override
                     public void onLoadMore(int position) {
