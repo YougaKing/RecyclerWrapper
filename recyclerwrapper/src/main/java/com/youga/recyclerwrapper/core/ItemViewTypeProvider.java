@@ -6,12 +6,6 @@ import android.view.ViewGroup;
 
 import com.youga.recyclerwrapper.view.ItemViewProvider;
 
-/**
- * @author YougaKingWu
- * @descibe ...
- * @date 2017/9/21 0021-9:59
- */
-
 public final class ItemViewTypeProvider implements ItemViewProvider {
 
     public static final int HEADER = LoadMoreWrapper.F_FAULT + 1, FOOTER = HEADER + 1;
