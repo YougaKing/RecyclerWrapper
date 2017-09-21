@@ -25,13 +25,13 @@
 	}
 
 	dependencies {
-	        compile 'com.github.YougaKing:RecyclerWrapper:0.0.1'
+	        compile 'com.github.YougaKing:RecyclerWrapper:0.0.2'
 	}
 ```
 
 * or jcenter:
 ```
-compile 'com.youga.recyclerwrapper:recyclerwrapper:0.0.1'
+compile 'com.youga:recyclerwrapper:0.0.2'
 ```
 #### 使用方法
 ```
@@ -116,8 +116,8 @@ mRevealListener.haveMore(users.size() >= 5, null)
 
 
 #### 版本
-* versionCode 1
-* versionName '0.0.1'
+* versionCode 2
+* versionName '0.0.2'
 
 # 关于作者
 * QQ交流群:158506055
