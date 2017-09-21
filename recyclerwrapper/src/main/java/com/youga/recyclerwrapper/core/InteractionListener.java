@@ -37,16 +37,12 @@ public interface InteractionListener {
 
         boolean loadMoreUnavailable();
 
-        TreeMap<Integer, ItemViewProvider> getItemViewProviders();
+        ItemViewProvider getHeaderProvider();
+
+        ItemViewProvider getFooterProvider();
     }
 
     interface RevealListener {
-
-        void addItemView(int position, ItemViewProvider viewProvider);
-
-        void addHeaderView(ItemViewProvider viewProvider);
-
-        void addFooterView(ItemViewProvider viewProvider);
 
         <K> void showLoadView(K k);
 

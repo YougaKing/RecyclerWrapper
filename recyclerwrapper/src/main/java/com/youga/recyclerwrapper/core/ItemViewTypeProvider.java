@@ -14,6 +14,8 @@ import com.youga.recyclerwrapper.view.ItemViewProvider;
 
 public final class ItemViewTypeProvider implements ItemViewProvider {
 
+    public static final int HEADER = LoadMoreWrapper.F_FAULT + 1, FOOTER = HEADER + 1;
+
     private ItemViewProvider viewProvider;
     private int viewType;
 

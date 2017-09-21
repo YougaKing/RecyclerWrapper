@@ -42,51 +42,34 @@ public final class RealAdapter extends AdapterWrapper {
         }
     }
 
+    private int measureItemCount() {
+        int size = 0;
+        if (mListener.getHeaderProvider() != null) size++;
+        if (mListener.getFooterProvider() != null) size++;
+        return super.getItemCount() + size;
+    }
+
     @Override
     public int getItemViewType(int position) {
         if (position == 0 && mListener.getFillType() != FillWrapper.NONE) {
             return mListener.getFillType();
-        } else if (position == measureItemCount()) {
+        } else if (position == 0 && mListener.getHeaderProvider() != null) {
+            return ((ItemViewTypeProvider) mListener.getHeaderProvider()).getViewType();
+        } else if (position == getItemCount() - 1 && mListener.getFooterProvider() != null) {
+            return ((ItemViewTypeProvider) mListener.getFooterProvider()).getViewType();
+        } else if (position == getItemCount()) {
             return mListener.getLoadMoreType();
-        } else if (position == measureItemCount() - 1 && mListener.getItemViewProviders().containsKey(Integer.MAX_VALUE)) {
-            return ((ItemViewTypeProvider) mListener.getItemViewProviders().get(Integer.MAX_VALUE)).getViewType();
         } else {
-            if (mListener.getItemViewProviders().isEmpty()) {
-                return super.getItemViewType(position);
-            } else {
-                boolean containsKey = mListener.getItemViewProviders().containsKey(position);
-                return containsKey ? ((ItemViewTypeProvider) mListener.getItemViewProviders().get(position)).getViewType() : super.getItemViewType(measurePosition(position));
-            }
+            return super.getItemViewType(measurePosition(position));
         }
-    }
-
-    private int measureItemCount() {
-        return super.getItemCount() + mListener.getItemViewProviders().size();
     }
 
     private int measurePosition(int position) {
         // TODO: 2017/9/21 0021
-        if (mListener.getItemViewProviders().isEmpty()) {
-            return position;
+        if (position >= 1 && mListener.getHeaderProvider() != null) {
+            return position - 1;
         }
-        int index = 0;
-        for (Integer key : mListener.getItemViewProviders().keySet()) {
-            if (key < position) {
-                index++;
-            }
-        }
-        return position - index;
-    }
-
-    private ItemViewTypeProvider containsViewType(int viewType) {
-        if (mListener.getItemViewProviders().isEmpty()) return null;
-        for (Integer key : mListener.getItemViewProviders().keySet()) {
-            ItemViewTypeProvider provider = (ItemViewTypeProvider) mListener.getItemViewProviders().get(key);
-            if (provider.getViewType() == viewType) {
-                return provider;
-            }
-        }
-        return null;
+        return position;
     }
 
     @Override
@@ -99,9 +82,12 @@ public final class RealAdapter extends AdapterWrapper {
             case LoadMoreWrapper.F_LOAD:
             case LoadMoreWrapper.F_FAULT:
                 return new FootViewHolder(mListener.getLoadMoreView());
+            case ItemViewTypeProvider.HEADER:
+                return ((ItemViewTypeProvider) mListener.getHeaderProvider()).createViewHolder(parent);
+            case ItemViewTypeProvider.FOOTER:
+                return ((ItemViewTypeProvider) mListener.getFooterProvider()).createViewHolder(parent);
             default:
-                ItemViewTypeProvider provider = containsViewType(viewType);
-                return provider == null ? super.onCreateViewHolder(parent, viewType) : provider.createViewHolder(parent);
+                return super.onCreateViewHolder(parent, viewType);
         }
     }
 

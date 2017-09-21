@@ -2,9 +2,7 @@ package com.youga.recyclerwrapper;
 
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.SparseArray;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.youga.recyclerwrapper.core.InteractionListener;
 import com.youga.recyclerwrapper.adapter.RealAdapter;
@@ -16,8 +14,6 @@ import com.youga.recyclerwrapper.view.FillViewProvider;
 import com.youga.recyclerwrapper.view.ItemViewProvider;
 import com.youga.recyclerwrapper.view.LoadMoreViewProvider;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -31,7 +27,7 @@ class Interaction implements Wrapper {
     private RealAdapter realAdapter;
     private RecyclerView recyclerView;
     private LoadMoreListener mLoadMoreListener;
-    private TreeMap<Integer, ItemViewProvider> mProviderMap = new TreeMap<>();
+    private ItemViewProvider[] mProviders = new ItemViewProvider[2];
 
     Interaction(final RecyclerView recyclerView) {
         realAdapter = new RealAdapter(recyclerView.getAdapter(), mInternalListener);
@@ -56,20 +52,14 @@ class Interaction implements Wrapper {
     }
 
     @Override
-    public Wrapper addItemView(int position, ItemViewProvider viewProvider) {
-        mRevealListener.addItemView(position, viewProvider);
-        return this;
-    }
-
-    @Override
     public Wrapper addHeaderView(ItemViewProvider viewProvider) {
-        mRevealListener.addHeaderView(viewProvider);
+        mProviders[0] = new ItemViewTypeProvider(viewProvider, ItemViewTypeProvider.HEADER);
         return this;
     }
 
     @Override
     public Wrapper addFooterView(ItemViewProvider viewProvider) {
-        mRevealListener.addFooterView(viewProvider);
+        mProviders[1] = new ItemViewTypeProvider(viewProvider, ItemViewTypeProvider.FOOTER);
         return this;
     }
 
@@ -97,28 +87,6 @@ class Interaction implements Wrapper {
     }
 
     private InteractionListener.RevealListener mRevealListener = new InteractionListener.RevealListener() {
-
-        @Override
-        public void addItemView(int position, ItemViewProvider viewProvider) {
-            int viewType;
-            if (mProviderMap.isEmpty()) {
-                viewType = LoadMoreWrapper.F_FAULT + 1;
-            } else {
-                ItemViewTypeProvider typeProvider = (ItemViewTypeProvider) mProviderMap.get(mProviderMap.lastKey());
-                viewType = typeProvider.getViewType() + 1;
-            }
-            mProviderMap.put(position, new ItemViewTypeProvider(viewProvider, viewType));
-        }
-
-        @Override
-        public void addHeaderView(ItemViewProvider viewProvider) {
-            addItemView(0, viewProvider);
-        }
-
-        @Override
-        public void addFooterView(ItemViewProvider viewProvider) {
-            addItemView(Integer.MAX_VALUE, viewProvider);
-        }
 
         @Override
         public <K> void showLoadView(K k) {
@@ -253,8 +221,13 @@ class Interaction implements Wrapper {
         }
 
         @Override
-        public TreeMap<Integer, ItemViewProvider> getItemViewProviders() {
-            return mProviderMap;
+        public ItemViewProvider getHeaderProvider() {
+            return mProviders[0];
+        }
+
+        @Override
+        public ItemViewProvider getFooterProvider() {
+            return mProviders[1];
         }
     };
 }

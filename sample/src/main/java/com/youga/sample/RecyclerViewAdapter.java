@@ -42,9 +42,9 @@ public class RecyclerViewAdapter extends BaseAdapter<User> {
         }
 
         public void bindPosition(int position) {
-            User user = mList.get(position);
-            title.setText(user.getLogin());
             mTextView.setText("position:" + position + "--\tsize:" + mList.size());
+//            User user = mList.get(position);
+//            title.setText(user.getLogin());
         }
     }
 
