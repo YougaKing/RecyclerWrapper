@@ -16,10 +16,10 @@ public interface Wrapper {
     <T extends View, K> Wrapper fillView(FillViewProvider<T, K> view);
 
     <T extends View, K> Wrapper loadMoreView(LoadMoreViewProvider<T, K> view);
-
-    Wrapper addHeaderView(ItemViewProvider viewProvider);
-
-    Wrapper addFooterView(ItemViewProvider viewProvider);
+//
+//    Wrapper addHeaderView(ItemViewProvider viewProvider);
+//
+//    Wrapper addFooterView(ItemViewProvider viewProvider);
 
     InteractionListener.RevealListener wrapper(LoadMoreListener listener);
 }

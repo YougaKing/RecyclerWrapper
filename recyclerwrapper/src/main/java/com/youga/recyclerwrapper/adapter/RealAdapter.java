@@ -1,6 +1,5 @@
 package com.youga.recyclerwrapper.adapter;
 
-import android.graphics.Paint;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -14,7 +13,6 @@ import com.youga.recyclerwrapper.core.FillWrapper;
 import com.youga.recyclerwrapper.core.ItemViewTypeProvider;
 import com.youga.recyclerwrapper.core.LoadMoreWrapper;
 import com.youga.recyclerwrapper.core.InteractionListener;
-import com.youga.recyclerwrapper.view.ItemViewProvider;
 
 
 /**
@@ -35,41 +33,22 @@ public final class RealAdapter extends AdapterWrapper {
             return 1;
         } else {
             if (mListener.loadMoreUnavailable()) {
-                return measureItemCount();
+                return super.getItemCount();
             } else {
-                return mListener.getLoadMoreType() != LoadMoreWrapper.F_NONE ? measureItemCount() + 1 : measureItemCount();
+                return mListener.getLoadMoreType() != LoadMoreWrapper.F_NONE ? super.getItemCount() + 1 : super.getItemCount();
             }
         }
-    }
-
-    private int measureItemCount() {
-        int size = 0;
-        if (mListener.getHeaderProvider() != null) size++;
-        if (mListener.getFooterProvider() != null) size++;
-        return super.getItemCount() + size;
     }
 
     @Override
     public int getItemViewType(int position) {
         if (position == 0 && mListener.getFillType() != FillWrapper.NONE) {
             return mListener.getFillType();
-        } else if (position == 0 && mListener.getHeaderProvider() != null) {
-            return ((ItemViewTypeProvider) mListener.getHeaderProvider()).getViewType();
-        } else if (position == getItemCount() - 1 && mListener.getFooterProvider() != null) {
-            return ((ItemViewTypeProvider) mListener.getFooterProvider()).getViewType();
-        } else if (position == getItemCount()) {
+        } else if (position == super.getItemCount()) {
             return mListener.getLoadMoreType();
         } else {
-            return super.getItemViewType(measurePosition(position));
+            return super.getItemViewType(position);
         }
-    }
-
-    private int measurePosition(int position) {
-        // TODO: 2017/9/21 0021
-        if (position >= 1 && mListener.getHeaderProvider() != null) {
-            return position - 1;
-        }
-        return position;
     }
 
     @Override
@@ -82,10 +61,6 @@ public final class RealAdapter extends AdapterWrapper {
             case LoadMoreWrapper.F_LOAD:
             case LoadMoreWrapper.F_FAULT:
                 return new FootViewHolder(mListener.getLoadMoreView());
-            case ItemViewTypeProvider.HEADER:
-                return ((ItemViewTypeProvider) mListener.getHeaderProvider()).createViewHolder(parent);
-            case ItemViewTypeProvider.FOOTER:
-                return ((ItemViewTypeProvider) mListener.getFooterProvider()).createViewHolder(parent);
             default:
                 return super.onCreateViewHolder(parent, viewType);
         }
@@ -103,7 +78,7 @@ public final class RealAdapter extends AdapterWrapper {
             ItemViewTypeProvider.ItemViewHolder viewHolder = (ItemViewTypeProvider.ItemViewHolder) holder;
             viewHolder.bindData(position);
         } else {
-            super.onBindViewHolder(holder, measurePosition(position));
+            super.onBindViewHolder(holder, position);
         }
     }
 

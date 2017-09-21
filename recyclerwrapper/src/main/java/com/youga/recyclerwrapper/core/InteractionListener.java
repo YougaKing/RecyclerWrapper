@@ -36,10 +36,6 @@ public interface InteractionListener {
         void loadMoreViewClick(View view, int position);
 
         boolean loadMoreUnavailable();
-
-        ItemViewProvider getHeaderProvider();
-
-        ItemViewProvider getFooterProvider();
     }
 
     interface RevealListener {

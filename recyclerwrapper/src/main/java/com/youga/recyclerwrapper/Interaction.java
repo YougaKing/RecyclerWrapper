@@ -7,14 +7,11 @@ import android.view.View;
 import com.youga.recyclerwrapper.core.InteractionListener;
 import com.youga.recyclerwrapper.adapter.RealAdapter;
 import com.youga.recyclerwrapper.core.FillWrapper;
-import com.youga.recyclerwrapper.core.ItemViewTypeProvider;
 import com.youga.recyclerwrapper.core.LoadMoreWrapper;
 import com.youga.recyclerwrapper.core.Wrapper;
 import com.youga.recyclerwrapper.view.FillViewProvider;
-import com.youga.recyclerwrapper.view.ItemViewProvider;
 import com.youga.recyclerwrapper.view.LoadMoreViewProvider;
 
-import java.util.TreeMap;
 
 /**
  * Created by Youga on 2017/8/17.
@@ -27,7 +24,6 @@ class Interaction implements Wrapper {
     private RealAdapter realAdapter;
     private RecyclerView recyclerView;
     private LoadMoreListener mLoadMoreListener;
-    private ItemViewProvider[] mProviders = new ItemViewProvider[2];
 
     Interaction(final RecyclerView recyclerView) {
         realAdapter = new RealAdapter(recyclerView.getAdapter(), mInternalListener);
@@ -48,18 +44,6 @@ class Interaction implements Wrapper {
     @Override
     public <T extends View, K> Wrapper loadMoreView(LoadMoreViewProvider<T, K> view) {
         loadMoreWrapper.setLoadMoreView(view);
-        return this;
-    }
-
-    @Override
-    public Wrapper addHeaderView(ItemViewProvider viewProvider) {
-        mProviders[0] = new ItemViewTypeProvider(viewProvider, ItemViewTypeProvider.HEADER);
-        return this;
-    }
-
-    @Override
-    public Wrapper addFooterView(ItemViewProvider viewProvider) {
-        mProviders[1] = new ItemViewTypeProvider(viewProvider, ItemViewTypeProvider.FOOTER);
         return this;
     }
 
@@ -218,16 +202,6 @@ class Interaction implements Wrapper {
         @Override
         public boolean loadMoreUnavailable() {
             return mLoadMoreListener == null;
-        }
-
-        @Override
-        public ItemViewProvider getHeaderProvider() {
-            return mProviders[0];
-        }
-
-        @Override
-        public ItemViewProvider getFooterProvider() {
-            return mProviders[1];
         }
     };
 }
