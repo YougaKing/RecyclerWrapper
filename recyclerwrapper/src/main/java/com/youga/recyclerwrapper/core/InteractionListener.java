@@ -3,6 +3,10 @@ package com.youga.recyclerwrapper.core;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.youga.recyclerwrapper.view.ItemViewProvider;
+
+import java.util.TreeMap;
+
 /**
  * Created by Youga on 2017/8/17.
  */
@@ -13,11 +17,11 @@ public interface InteractionListener {
 
         int getFillType();
 
-        int getFootType();
+        int getLoadMoreType();
 
         View getFillView();
 
-        View getFootView();
+        View getLoadMoreView();
 
         int getWidth();
 
@@ -27,14 +31,22 @@ public interface InteractionListener {
 
         void bindFillView(View view);
 
-        void bindFootView(View view, int position);
+        void bindLoadMoreView(View view, int position);
 
-        void footViewClick(View view, int position);
+        void loadMoreViewClick(View view, int position);
 
         boolean loadMoreUnavailable();
+
+        TreeMap<Integer, ItemViewProvider> getItemViewProviders();
     }
 
     interface RevealListener {
+
+        void addItemView(int position, ItemViewProvider viewProvider);
+
+        void addHeaderView(ItemViewProvider viewProvider);
+
+        void addFooterView(ItemViewProvider viewProvider);
 
         <K> void showLoadView(K k);
 
@@ -46,6 +58,6 @@ public interface InteractionListener {
 
         <K> void loadMoreFault(K k);
 
-        <K> void haveMore(boolean haveMore, K k);
+        void decideMore(boolean more);
     }
 }

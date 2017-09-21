@@ -1,9 +1,9 @@
 package com.youga.recyclerwrapper.adapter;
 
+import android.graphics.Paint;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +11,10 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 
 import com.youga.recyclerwrapper.core.FillWrapper;
-import com.youga.recyclerwrapper.core.FootWrapper;
+import com.youga.recyclerwrapper.core.ItemViewTypeProvider;
+import com.youga.recyclerwrapper.core.LoadMoreWrapper;
 import com.youga.recyclerwrapper.core.InteractionListener;
+import com.youga.recyclerwrapper.view.ItemViewProvider;
 
 
 /**
@@ -33,9 +35,9 @@ public final class RealAdapter extends AdapterWrapper {
             return 1;
         } else {
             if (mListener.loadMoreUnavailable()) {
-                return super.getItemCount();
+                return measureItemCount();
             } else {
-                return mListener.getFootType() != FootWrapper.F_NONE ? super.getItemCount() + 1 : super.getItemCount();
+                return mListener.getLoadMoreType() != LoadMoreWrapper.F_NONE ? measureItemCount() + 1 : measureItemCount();
             }
         }
     }
@@ -44,11 +46,47 @@ public final class RealAdapter extends AdapterWrapper {
     public int getItemViewType(int position) {
         if (position == 0 && mListener.getFillType() != FillWrapper.NONE) {
             return mListener.getFillType();
-        } else if (position == super.getItemCount()) {
-            return mListener.getFootType();
+        } else if (position == measureItemCount()) {
+            return mListener.getLoadMoreType();
+        } else if (position == measureItemCount() - 1 && mListener.getItemViewProviders().containsKey(Integer.MAX_VALUE)) {
+            return ((ItemViewTypeProvider) mListener.getItemViewProviders().get(Integer.MAX_VALUE)).getViewType();
         } else {
-            return super.getItemViewType(position);
+            if (mListener.getItemViewProviders().isEmpty()) {
+                return super.getItemViewType(position);
+            } else {
+                boolean containsKey = mListener.getItemViewProviders().containsKey(position);
+                return containsKey ? ((ItemViewTypeProvider) mListener.getItemViewProviders().get(position)).getViewType() : super.getItemViewType(measurePosition(position));
+            }
         }
+    }
+
+    private int measureItemCount() {
+        return super.getItemCount() + mListener.getItemViewProviders().size();
+    }
+
+    private int measurePosition(int position) {
+        // TODO: 2017/9/21 0021
+        if (mListener.getItemViewProviders().isEmpty()) {
+            return position;
+        }
+        int index = 0;
+        for (Integer key : mListener.getItemViewProviders().keySet()) {
+            if (key < position) {
+                index++;
+            }
+        }
+        return position - index;
+    }
+
+    private ItemViewTypeProvider containsViewType(int viewType) {
+        if (mListener.getItemViewProviders().isEmpty()) return null;
+        for (Integer key : mListener.getItemViewProviders().keySet()) {
+            ItemViewTypeProvider provider = (ItemViewTypeProvider) mListener.getItemViewProviders().get(key);
+            if (provider.getViewType() == viewType) {
+                return provider;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -58,11 +96,12 @@ public final class RealAdapter extends AdapterWrapper {
             case FillWrapper.EMPTY:
             case FillWrapper.ERROR:
                 return new FillViewHolder(mListener.getFillView());
-            case FootWrapper.F_LOAD:
-            case FootWrapper.F_FAULT:
-                return new FootViewHolder(mListener.getFootView());
+            case LoadMoreWrapper.F_LOAD:
+            case LoadMoreWrapper.F_FAULT:
+                return new FootViewHolder(mListener.getLoadMoreView());
             default:
-                return super.onCreateViewHolder(parent, viewType);
+                ItemViewTypeProvider provider = containsViewType(viewType);
+                return provider == null ? super.onCreateViewHolder(parent, viewType) : provider.createViewHolder(parent);
         }
     }
 
@@ -74,8 +113,11 @@ public final class RealAdapter extends AdapterWrapper {
         } else if (holder instanceof FootViewHolder) {
             FootViewHolder footHolder = (FootViewHolder) holder;
             footHolder.bindView();
+        } else if (holder instanceof ItemViewTypeProvider.ItemViewHolder) {
+            ItemViewTypeProvider.ItemViewHolder viewHolder = (ItemViewTypeProvider.ItemViewHolder) holder;
+            viewHolder.bindData(position);
         } else {
-            super.onBindViewHolder(holder, position);
+            super.onBindViewHolder(holder, measurePosition(position));
         }
     }
 
@@ -143,10 +185,10 @@ public final class RealAdapter extends AdapterWrapper {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mListener.footViewClick(itemView, getAdapter().getItemCount());
+                    mListener.loadMoreViewClick(itemView, getAdapter().getItemCount());
                 }
             });
-            mListener.bindFootView(itemView, getAdapter().getItemCount());
+            mListener.bindLoadMoreView(itemView, getAdapter().getItemCount());
         }
     }
 }

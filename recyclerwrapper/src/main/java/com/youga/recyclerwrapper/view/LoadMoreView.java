@@ -19,17 +19,17 @@ import com.youga.recyclerwrapper.R;
  * Created by Youga on 2017/8/18.
  */
 
-public class FootView extends LinearLayout {
+public class LoadMoreView extends LinearLayout {
 
-    public FootView(@NonNull Context context) {
+    public LoadMoreView(@NonNull Context context) {
         this(context, null);
     }
 
-    public FootView(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public LoadMoreView(@NonNull Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public FootView(@NonNull Context context, @Nullable AttributeSet attrs, @AttrRes int defStyleAttr) {
+    public LoadMoreView(@NonNull Context context, @Nullable AttributeSet attrs, @AttrRes int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
 

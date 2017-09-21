@@ -33,7 +33,7 @@ public class RecyclerViewAdapter extends BaseAdapter<User> {
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView title ,mTextView;
+        public TextView title, mTextView;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -44,7 +44,7 @@ public class RecyclerViewAdapter extends BaseAdapter<User> {
         public void bindPosition(int position) {
             User user = mList.get(position);
             title.setText(user.getLogin());
-            mTextView.setText(String.valueOf(position + 1));
+            mTextView.setText("position:" + position + "--\tsize:" + mList.size());
         }
     }
 

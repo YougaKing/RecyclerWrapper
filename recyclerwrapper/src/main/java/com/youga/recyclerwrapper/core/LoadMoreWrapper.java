@@ -3,8 +3,7 @@ package com.youga.recyclerwrapper.core;
 import android.support.annotation.IntDef;
 import android.view.View;
 
-import com.youga.recyclerwrapper.view.FootView;
-import com.youga.recyclerwrapper.view.IFootViewProvider;
+import com.youga.recyclerwrapper.view.LoadMoreViewProvider;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -12,9 +11,9 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * Created by YougaKing on 2016/8/11.
  */
-public class FootWrapper<T extends View, K> {
+public class LoadMoreWrapper<T extends View, K> {
 
-    public static final int F_NONE = 16843834, F_LOAD = 16843835, F_FAULT = 16843836;
+    public static final int F_NONE = FillWrapper.ERROR + 1, F_LOAD = F_NONE + 1, F_FAULT = F_LOAD + 1;
     private int mType = F_NONE;
 
     @IntDef({F_LOAD, F_FAULT})
@@ -26,14 +25,14 @@ public class FootWrapper<T extends View, K> {
     private boolean isLoading;
     private K k;
 
-    private IFootViewProvider<T, K> footView;
+    private LoadMoreViewProvider<T, K> loadMoreView;
 
-    public IFootViewProvider<T, K> getFootView() {
-        return footView;
+    public LoadMoreViewProvider<T, K> getLoadMoreView() {
+        return loadMoreView;
     }
 
-    public void setFootView(IFootViewProvider<T, K> footView) {
-        this.footView = footView;
+    public void setLoadMoreView(LoadMoreViewProvider<T, K> loadMoreView) {
+        this.loadMoreView = loadMoreView;
     }
 
     public int getType() {

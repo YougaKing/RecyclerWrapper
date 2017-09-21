@@ -5,18 +5,13 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.youga.recyclerwrapper.core.InteractionListener;
 import com.youga.recyclerwrapper.core.Wrapper;
 import com.youga.recyclerwrapper.view.FillView;
 import com.youga.recyclerwrapper.core.FillWrapper;
-import com.youga.recyclerwrapper.core.FootWrapper;
-import com.youga.recyclerwrapper.view.FootView;
-import com.youga.recyclerwrapper.view.IFillViewProvider;
-import com.youga.recyclerwrapper.view.IFootViewProvider;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import com.youga.recyclerwrapper.core.LoadMoreWrapper;
+import com.youga.recyclerwrapper.view.LoadMoreView;
+import com.youga.recyclerwrapper.view.FillViewProvider;
+import com.youga.recyclerwrapper.view.LoadMoreViewProvider;
 
 /**
  * Created by Youga on 2017/8/17.
@@ -25,9 +20,8 @@ import java.util.List;
 public class RecyclerWrapper {
 
     private static RecyclerWrapper INSTANCE;
-    IFillViewProvider[] fillViewProviders = new IFillViewProvider[2];
-    IFootViewProvider[] footViewProviders = new IFootViewProvider[2];
-    InteractionListener.RevealListener listener;
+    FillViewProvider[] fillViewProviders = new FillViewProvider[2];
+    LoadMoreViewProvider[] loadMoreViewProviders = new LoadMoreViewProvider[2];
 
     private RecyclerWrapper() {
     }
@@ -49,21 +43,20 @@ public class RecyclerWrapper {
             throw new IllegalStateException("RecyclerView has no LayoutManager");
         }
         initDefaultView(recyclerView.getContext().getApplicationContext());
-        Interaction interaction = new Interaction(recyclerView);
-        return interaction.getWrapper();
+        return new Interaction(recyclerView);
     }
 
-    public static <T extends View, K> void registerFillViewProvider(IFillViewProvider<T, K> view) {
+    public static <T extends View, K> void registerFillViewProvider(FillViewProvider<T, K> view) {
         getInstance().fillViewProviders[1] = view;
     }
 
-    public static <T extends View, K> void registerFootViewProvider(IFootViewProvider<T, K> view) {
-        getInstance().footViewProviders[1] = view;
+    public static <T extends View, K> void registerFootViewProvider(LoadMoreViewProvider<T, K> view) {
+        getInstance().loadMoreViewProviders[1] = view;
     }
 
     private static void initDefaultView(final Context context) {
         if (getInstance().fillViewProviders[0] == null) {
-            getInstance().fillViewProviders[0] = new IFillViewProvider<FillView, String>() {
+            getInstance().fillViewProviders[0] = new FillViewProvider<FillView, String>() {
                 @Override
                 public FillView createView() {
                     return new FillView(context);
@@ -82,19 +75,19 @@ public class RecyclerWrapper {
             };
         }
 
-        if (getInstance().footViewProviders[0] == null) {
-            getInstance().footViewProviders[0] = new IFootViewProvider<FootView, String>() {
+        if (getInstance().loadMoreViewProviders[0] == null) {
+            getInstance().loadMoreViewProviders[0] = new LoadMoreViewProvider<LoadMoreView, String>() {
                 @Override
-                public FootView createView() {
-                    return new FootView(context);
+                public LoadMoreView createView() {
+                    return new LoadMoreView(context);
                 }
 
                 @Override
-                public void bindView(FootView footView, String s, @FootWrapper.Type int type) {
-                    if (type == FootWrapper.F_LOAD) {
-                        footView.showLoading();
+                public void bindView(LoadMoreView loadMoreView, String s, @LoadMoreWrapper.Type int type) {
+                    if (type == LoadMoreWrapper.F_LOAD) {
+                        loadMoreView.showLoading();
                     } else {
-                        footView.showFault();
+                        loadMoreView.showFault();
                     }
                 }
             };

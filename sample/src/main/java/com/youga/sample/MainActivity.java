@@ -3,32 +3,27 @@ package com.youga.sample;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 import com.google.gson.reflect.TypeToken;
 import com.youga.recyclerwrapper.LoadMoreListener;
 import com.youga.recyclerwrapper.RecyclerWrapper;
-import com.youga.recyclerwrapper.core.FillWrapper;
-import com.youga.recyclerwrapper.core.FootWrapper;
 import com.youga.recyclerwrapper.core.InteractionListener;
-import com.youga.recyclerwrapper.view.IFillViewProvider;
-import com.youga.recyclerwrapper.view.IFootViewProvider;
+import com.youga.recyclerwrapper.view.ItemViewProvider;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -97,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mAdapter);
 
         mRevealListener = RecyclerWrapper.with(mRecyclerView)
+                .addHeaderView(new HeaderViewProvider())
                 .wrapper(new LoadMoreListener() {
                     @Override
                     public void onLoadMore(int position) {
@@ -121,6 +117,22 @@ public class MainActivity extends AppCompatActivity {
         requestList(LOAD_MORE, user.getId());
     }
 
+    private class HeaderViewProvider implements ItemViewProvider {
+
+        private TextView mTextView;
+
+        @Override
+        public View createView(ViewGroup parent) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_header_view, parent, false);
+            mTextView = (TextView) v.findViewById(R.id.textView);
+            return v;
+        }
+
+        @Override
+        public void bindData(int position) {
+            mTextView.setText(String.valueOf(position));
+        }
+    }
 
     void requestList(final String type, int since) {
         Type typeToken = new TypeToken<List<User>>() {
@@ -151,16 +163,17 @@ public class MainActivity extends AppCompatActivity {
                         mAdapter.getDataList().clear();
                         mAdapter.getDataList().addAll(users);
                         mAdapter.notifyDataSetChanged();
-                        mRevealListener.haveMore(users.size() >= 5, null);
                         if (users.size() == 0) {
                             mRevealListener.showEmptyView(null);//显示请求结果为空时显示
+                        } else {
+                            mRevealListener.decideMore(users.size() >= 5);
                         }
                         break;
                     case LOAD_MORE:
                         if (mNotMore) users.remove(0);
                         mAdapter.getDataList().addAll(users);
                         mAdapter.notifyDataSetChanged();
-                        mRevealListener.haveMore(users.size() >= 5, null);
+                        mRevealListener.decideMore(users.size() >= 5);
                         break;
                 }
             }

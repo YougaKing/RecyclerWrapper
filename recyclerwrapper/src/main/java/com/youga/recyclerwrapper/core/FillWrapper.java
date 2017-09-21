@@ -3,8 +3,7 @@ package com.youga.recyclerwrapper.core;
 import android.support.annotation.IntDef;
 import android.view.View;
 
-import com.youga.recyclerwrapper.view.FillView;
-import com.youga.recyclerwrapper.view.IFillViewProvider;
+import com.youga.recyclerwrapper.view.FillViewProvider;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -14,7 +13,7 @@ import java.lang.annotation.RetentionPolicy;
  */
 public class FillWrapper<T extends View, K> {
 
-    public static final int NONE = 16843830, LOAD = 16843831, EMPTY = 16843832, ERROR = 16843833;
+    public static final int NONE = 16843830, LOAD = NONE + 1, EMPTY = LOAD + 1, ERROR = EMPTY + 1;
     private int mType = NONE;
 
     @IntDef({LOAD, EMPTY, ERROR})
@@ -25,13 +24,13 @@ public class FillWrapper<T extends View, K> {
 
     private K k;
 
-    private IFillViewProvider<T, K> fillView;
+    private FillViewProvider<T, K> fillView;
 
-    public IFillViewProvider<T, K> getFillView() {
+    public FillViewProvider<T, K> getFillView() {
         return fillView;
     }
 
-    public void setFillView(IFillViewProvider<T, K> fillView) {
+    public void setFillView(FillViewProvider<T, K> fillView) {
         this.fillView = fillView;
     }
 

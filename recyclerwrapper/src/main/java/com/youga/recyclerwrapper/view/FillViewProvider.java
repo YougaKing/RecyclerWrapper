@@ -8,7 +8,7 @@ import com.youga.recyclerwrapper.core.FillWrapper;
  * Created by Youga on 2017/8/18.
  */
 
-public interface IFillViewProvider<T extends View, K> {
+public interface FillViewProvider<T extends View, K> {
 
     T createView();
 
