@@ -7,15 +7,6 @@
 * 支持HORIZONTAL VERTICAL
 
 #### Download
-* Download the latest JAR or grab via Maven:
-```xml
-<dependency>
-  <groupId>com.youga.recyclerwrapper</groupId>
-  <artifactId>RecyclerWrapper</artifactId>
-  <version>0.1</version>
-  <type>pom</type>
-</dependency>
-```
 * JitPack:
 ```
 	allprojects {
@@ -109,7 +100,7 @@ mRevealListener.showErrorView(null);
 mRevealListener.showEmptyView(null)
 
 数据是否还有更多
-mRevealListener.haveMore(users.size() >= 5, null)
+mRevealListener.decideMore(users.size() >= 5, null)
 
 
 ```
