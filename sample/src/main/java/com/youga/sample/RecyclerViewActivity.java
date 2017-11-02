@@ -28,9 +28,8 @@ import com.youga.recyclerwrapper.view.ItemViewProvider;
 import java.lang.reflect.Type;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class RecyclerViewActivity extends AppCompatActivity {
 
-    static final String REFRESH = "REFRESH", LOAD_MORE = "LOAD_MORE";
     private RecyclerView mRecyclerView;
     private BaseAdapter<User> mAdapter;
     private Toolbar toolbar;
@@ -41,18 +40,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_recyclerview);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-//        navigationView.setNavigationItemSelectedListener(this);
         init();
     }
 
@@ -64,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
                 switch (item.getItemId()) {
                     case R.id.refresh:
                         mNotMore = false;
-                        requestList(REFRESH, 0);
+                        requestList(0);
                         mRevealListener.showLoadView(null);
                         break;
                     case R.id.empty:
@@ -91,89 +87,59 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(mAdapter);
 
-        mRevealListener = RecyclerWrapper.with(mRecyclerView)
-                .wrapper(new LoadMoreListener() {
-                    @Override
-                    public void onLoadMore(int position) {
-                        onDrag();
-                    }
-                });
+        mRevealListener = RecyclerWrapper.with(mRecyclerView).wrapper(new LoadMoreListener() {
+            @Override
+            public void onLoadMore(int position) {
+                User user = mAdapter.getLastNumber();
+                requestList(user.getId());
+            }
+        });
 
         mRevealListener.showLoadView(null);
-        requestList(REFRESH, 0);
+        requestList(0);
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 mNotMore = false;
-                requestList(REFRESH, 0);
+                requestList(0);
             }
         });
     }
 
-    private void onDrag() {
-        User user = mAdapter.getLastNumber();
-        requestList(LOAD_MORE, user.getId());
-    }
-
-    private class HeaderViewProvider implements ItemViewProvider {
-
-        private TextView mTextView;
-
-        @Override
-        public View createView(ViewGroup parent) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_header_view, parent, false);
-            mTextView = (TextView) v.findViewById(R.id.textView);
-            return v;
-        }
-
-        @Override
-        public void bindData(int position) {
-            mTextView.setText(String.valueOf(position));
-        }
-    }
-
-    void requestList(final String type, int since) {
-        Type typeToken = new TypeToken<List<User>>() {
-        }.getType();
-        HttpUtil.getAllUsers(LOAD_MORE.equals(type) ? since : 0, typeToken, new HttpCallback<List<User>>() {
+    void requestList(final int since) {
+        HttpUtil.getAllUsers(since, new HttpCallback<List<User>>() {
             @Override
             public void onFailure(String message) {
-                switch (type) {
-                    case REFRESH:
-                        mSwipeRefreshLayout.setEnabled(true);
-                        mSwipeRefreshLayout.setRefreshing(false);
-                        showToast(message);
-                        mRevealListener.showErrorView(null);
-                        break;
-                    case LOAD_MORE:
-                        showToast(message);
-                        mRevealListener.showErrorView(null);
-                        break;
+                if (since == 0) {
+                    mSwipeRefreshLayout.setEnabled(true);
+                    mSwipeRefreshLayout.setRefreshing(false);
+                    showToast(message);
+                    mRevealListener.showErrorView(null);
+                } else {
+                    showToast(message);
+                    mRevealListener.showErrorView(null);
                 }
             }
 
             @Override
             public void onResponse(List<User> users, String message) {
-                switch (type) {
-                    case REFRESH:
-                        mSwipeRefreshLayout.setEnabled(true);
-                        mSwipeRefreshLayout.setRefreshing(false);
-                        mAdapter.getDataList().clear();
-                        mAdapter.getDataList().addAll(users);
-                        mAdapter.notifyDataSetChanged();
-                        if (users.size() == 0) {
-                            mRevealListener.showEmptyView(null);//显示请求结果为空时显示
-                        } else {
-                            mRevealListener.decideMore(users.size() >= 5);
-                        }
-                        break;
-                    case LOAD_MORE:
-                        if (mNotMore) users.remove(0);
-                        mAdapter.getDataList().addAll(users);
-                        mAdapter.notifyDataSetChanged();
+                if (since == 0) {
+                    mSwipeRefreshLayout.setEnabled(true);
+                    mSwipeRefreshLayout.setRefreshing(false);
+                    mAdapter.getDataList().clear();
+                    mAdapter.getDataList().addAll(users);
+                    mAdapter.notifyDataSetChanged();
+                    if (users.size() == 0) {
+                        mRevealListener.showEmptyView(null);//显示请求结果为空时显示
+                    } else {
                         mRevealListener.decideMore(users.size() >= 5);
-                        break;
+                    }
+                } else {
+                    if (mNotMore) users.remove(0);
+                    mAdapter.getDataList().addAll(users);
+                    mAdapter.notifyDataSetChanged();
+                    mRevealListener.decideMore(users.size() >= 5);
                 }
             }
         });

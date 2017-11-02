@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ListView;
 
 import com.youga.recyclerwrapper.core.Wrapper;
 import com.youga.recyclerwrapper.view.FillView;
@@ -43,7 +44,15 @@ public class RecyclerWrapper {
             throw new IllegalStateException("RecyclerView has no LayoutManager");
         }
         initDefaultView(recyclerView.getContext().getApplicationContext());
-        return new Interaction(recyclerView);
+        return new RecyclerViewInteraction(recyclerView);
+    }
+
+    public static Wrapper with(@NonNull final ListView listView) {
+        if (listView.getAdapter() == null) {
+            throw new IllegalStateException("ListView has no Adapter");
+        }
+        initDefaultView(listView.getContext().getApplicationContext());
+        return new ListViewInteraction(listView);
     }
 
     public static <T extends View, K> void registerFillViewProvider(FillViewProvider<T, K> view) {

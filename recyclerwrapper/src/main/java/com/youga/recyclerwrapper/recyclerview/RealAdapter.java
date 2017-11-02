@@ -1,4 +1,4 @@
-package com.youga.recyclerwrapper.adapter;
+package com.youga.recyclerwrapper.recyclerview;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;

@@ -5,7 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.youga.recyclerwrapper.core.InteractionListener;
-import com.youga.recyclerwrapper.adapter.RealAdapter;
+import com.youga.recyclerwrapper.recyclerview.RealAdapter;
 import com.youga.recyclerwrapper.core.FillWrapper;
 import com.youga.recyclerwrapper.core.LoadMoreWrapper;
 import com.youga.recyclerwrapper.core.Wrapper;
@@ -17,7 +17,7 @@ import com.youga.recyclerwrapper.view.LoadMoreViewProvider;
  * Created by Youga on 2017/8/17.
  */
 
-class Interaction implements Wrapper {
+class RecyclerViewInteraction implements Wrapper {
 
     private FillWrapper fillWrapper = new FillWrapper<>();
     private LoadMoreWrapper loadMoreWrapper = new LoadMoreWrapper<>();
@@ -25,7 +25,7 @@ class Interaction implements Wrapper {
     private RecyclerView recyclerView;
     private LoadMoreListener mLoadMoreListener;
 
-    Interaction(final RecyclerView recyclerView) {
+    RecyclerViewInteraction(final RecyclerView recyclerView) {
         realAdapter = new RealAdapter(recyclerView.getAdapter(), mInternalListener);
         this.recyclerView = recyclerView;
 

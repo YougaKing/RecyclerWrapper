@@ -34,8 +34,7 @@ public class HttpUtil {
     private static HttpUtil getInstance() {
         if (mInstance == null) {
             synchronized (HttpUtil.class) {
-                if (mInstance == null)
-                    mInstance = new HttpUtil();
+                if (mInstance == null) mInstance = new HttpUtil();
             }
 
         }
@@ -43,48 +42,45 @@ public class HttpUtil {
     }
 
 
-    public static <T> void getAllUsers(int since, final Type type, final HttpCallback<T> callback) {
+    public static <T> void getAllUsers(int since, final HttpCallback<T> callback) {
+        final Type type = new TypeToken<List<User>>() {
+        }.getType();
         final String url = "https://api.github.com/users?per_page=5";
-        Request request = new Request
-                .Builder()
-                .url(since == 0 ? url : url + "&since=" + since)
-                .build();
-        getInstance().mOkHttpClient
-                .newCall(request)
-                .enqueue(new Callback() {
+        Request request = new Request.Builder().url(since == 0 ? url : url + "&since=" + since).build();
+        getInstance().mOkHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, final IOException e) {
+                postMain(new Runnable() {
                     @Override
-                    public void onFailure(Call call, final IOException e) {
-                        postMain(new Runnable() {
-                            @Override
-                            public void run() {
-                                callback.onFailure(e.getMessage());
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onResponse(final Call call, final Response response) throws IOException {
-                        try {
-                            String json = response.body().string();
-                            final T users = getInstance().mGson.fromJson(json, type);
-                            postMain(new Runnable() {
-                                @Override
-                                public void run() {
-                                    callback.onResponse(users, "success");
-                                }
-                            });
-                        } catch (final IOException e) {
-                            e.printStackTrace();
-                            postMain(new Runnable() {
-                                @Override
-                                public void run() {
-                                    callback.onFailure(e.getMessage());
-                                }
-                            });
-                        }
-
+                    public void run() {
+                        callback.onFailure(e.getMessage());
                     }
                 });
+            }
+
+            @Override
+            public void onResponse(final Call call, final Response response) throws IOException {
+                try {
+                    String json = response.body().string();
+                    final T users = getInstance().mGson.fromJson(json, type);
+                    postMain(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.onResponse(users, "success");
+                        }
+                    });
+                } catch (final IOException e) {
+                    e.printStackTrace();
+                    postMain(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.onFailure(e.getMessage());
+                        }
+                    });
+                }
+
+            }
+        });
 
     }
 
